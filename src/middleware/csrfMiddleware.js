@@ -4,23 +4,22 @@ const ApiError = require("../utils/ApiError");
 const getTrustedOrigins = () => {
     const configuredOrigins = process.env.CSRF_TRUSTED_ORIGINS;
 
-    if (configuredOrigins) {
-        return configuredOrigins
-            .split(",")
-            .map((origin) => origin.trim())
-            .filter(Boolean);
-    }
-
-    if (process.env.NODE_ENV === "production") {
-        return [];
-    }
-
-    return [
+    const defaultOrigins = [
         "http://localhost:3000",
         "http://localhost:3001",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3001",
+        "https://prince-defence-frontend.vercel.app",
+        "https://prince-defence-admin.vercel.app",
     ];
+
+    const additionalOrigins = configuredOrigins
+        ? configuredOrigins.split(",")
+        : [];
+
+    return [...new Set([...defaultOrigins, ...additionalOrigins]
+        .map((origin) => origin.trim().replace(/\/+$/, ""))
+        .filter(Boolean))];
 };
 
 const csrfMiddleware = (req, res, next) => {
