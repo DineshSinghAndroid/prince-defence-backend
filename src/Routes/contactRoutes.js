@@ -19,7 +19,7 @@ const router = express.Router();
 
 
 // PUBLIC
-// Website se enquiry submit hogi
+// Submit enquiries from the website.
 router.post(
     "/",
     validate(contactSchema),

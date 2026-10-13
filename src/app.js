@@ -15,7 +15,8 @@ const dashboardRoutes = require("./Routes/dashboardRoutes");
 const passwordResetRoutes = require("./Routes/passwordResetRoutes");
 const quizRoutes = require("./Routes/quizRoutes");
 const analyticsRoutes = require("./Routes/analyticsRoutes");
-// const googleRoutes = require("./Routes/googleRoutes");
+const achieverRoutes = require("./Routes/achieverRoutes");
+const achieverCategoryRoutes = require("./Routes/achieverCategoryRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -29,10 +30,14 @@ const defaultOrigins = [
     "https://prince-defence-admin.vercel.app",
 ];
 
-const allowedOrigins = (
-    process.env.FRONTEND_ORIGINS || defaultOrigins.join(",")
-)
-    .split(",")
+const configuredOrigins = process.env.FRONTEND_ORIGINS
+    ? process.env.FRONTEND_ORIGINS.split(",")
+    : [];
+
+const allowedOrigins = [...new Set([
+    ...defaultOrigins,
+    ...configuredOrigins,
+])]
     .map((origin) => origin.trim().replace(/\/+$/, ""))
     .filter(Boolean);
 
@@ -65,7 +70,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/forgot-password", passwordResetRoutes);
-// app.use("/api/google", googleRoutes);
+app.use("/api/achievers", achieverRoutes);
+app.use("/api/achiever-categories", achieverCategoryRoutes);
 
 app.use(errorMiddleware);
 
