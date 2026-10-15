@@ -74,8 +74,10 @@ const listAchievers = async (
 
     const currentPage = Math.max(1, Number(page) || 1);
     const pageLimit = Math.min(100, Math.max(1, Number(limit) || 12));
+    const yearFilter = { ...filter };
+    delete yearFilter.year;
 
-    const [items, total] = await Promise.all([
+    const [items, total, years] = await Promise.all([
         Achiever.find(filter)
             .select("-__v")
             .populate("categoryId", "name slug")
@@ -84,12 +86,15 @@ const listAchievers = async (
             .limit(pageLimit)
             .lean(),
         Achiever.countDocuments(filter),
+        Achiever.distinct("year", yearFilter),
     ]);
 
     const totalPages = Math.ceil(total / pageLimit);
+    years.sort((first, second) => second - first);
 
     return {
         items,
+        years,
         pagination: {
             page: currentPage,
             limit: pageLimit,
