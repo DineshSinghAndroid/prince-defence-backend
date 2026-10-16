@@ -1179,8 +1179,8 @@ const getQuizArchiveDates = async ({
 
 const getQuizCategories = async () => {
   return QuizCategory.find({})
-    .select("name normalizedName active")
-    .sort({ name: 1 })
+    .select("name normalizedName active order")
+    .sort({ order: 1, name: 1 })
     .lean();
 };
 
@@ -1197,11 +1197,34 @@ const createQuizCategory = async (name) => {
 
   const normalizedName = cleanName.toLocaleLowerCase("en-IN");
   try {
-    return await QuizCategory.create({ name: cleanName, normalizedName });
+    const highest = await QuizCategory.findOne({}).sort({ order: -1 }).select("order").lean();
+    const nextOrder = (highest?.order ?? -1) + 1;
+    return await QuizCategory.create({ name: cleanName, normalizedName, order: nextOrder });
   } catch (error) {
     if (error.code === 11000) return { duplicate: true };
     throw error;
   }
+};
+
+const reorderQuizCategories = async (orderedIds) => {
+  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+    return { error: "orderedIds array is required" };
+  }
+
+  const bulkOps = orderedIds
+    .filter((id) => mongoose.isValidObjectId(id))
+    .map((id, index) => ({
+      updateOne: {
+        filter: { _id: new mongoose.Types.ObjectId(id) },
+        update: { $set: { order: index } },
+      },
+    }));
+
+  if (bulkOps.length > 0) {
+    await QuizCategory.bulkWrite(bulkOps);
+  }
+
+  return getQuizCategories();
 };
 
 const updateQuizCategory = async (categoryId, categoryData) => {
@@ -1284,6 +1307,20 @@ const getPublicQuizCategories = async (
         },
       },
     ]);
+
+  try {
+    const allOrderedCategories = await QuizCategory.find({ active: true }).sort({ order: 1, name: 1 }).select("name order").lean();
+    const orderMap = new Map(allOrderedCategories.map((c, i) => [c.name.toLowerCase(), i]));
+    categories.sort((a, b) => {
+      const catA = (a.category || "").toLowerCase();
+      const catB = (b.category || "").toLowerCase();
+      const orderA = orderMap.has(catA) ? orderMap.get(catA) : 9999;
+      const orderB = orderMap.has(catB) ? orderMap.get(catB) : 9999;
+      return orderA - orderB;
+    });
+  } catch {
+    // Keep aggregation default order if category lookup fails
+  }
 
   return {
     date: dateKey,
@@ -2122,6 +2159,7 @@ module.exports = {
 
   createQuizCategory,
   updateQuizCategory,
+  reorderQuizCategories,
 
   createQuestion,
   updateQuizQuestion,

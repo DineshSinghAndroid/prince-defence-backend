@@ -7,6 +7,7 @@ const {
     getCategories,
     updateCategory,
     deleteCategory,
+    reorderCategories,
 } = require("../controllers/achieverCategoryController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -18,6 +19,7 @@ const validate = require("../middleware/validateMiddleware");
 const {
     createCategorySchema,
     updateCategorySchema,
+    reorderCategoriesSchema,
 } = require("../validators/achieverCategoryValidator");
 
 // Public: Get categories
@@ -34,6 +36,25 @@ router.post(
     csrfMiddleware,
     validate(createCategorySchema),
     asyncHandler(createCategory)
+);
+
+// Admin: Reorder categories (defined before /:id)
+router.put(
+    "/reorder",
+    authMiddleware,
+    authorize("superAdmin"),
+    csrfMiddleware,
+    validate(reorderCategoriesSchema),
+    asyncHandler(reorderCategories)
+);
+
+router.patch(
+    "/reorder",
+    authMiddleware,
+    authorize("superAdmin"),
+    csrfMiddleware,
+    validate(reorderCategoriesSchema),
+    asyncHandler(reorderCategories)
 );
 
 // Admin: Update category

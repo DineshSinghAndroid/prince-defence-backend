@@ -48,9 +48,22 @@ const deleteCategory = async (req, res) => {
     });
 };
 
+const reorderCategories = async (req, res) => {
+    const categories = await achieverCategoryService.reorderCategories(
+        req.body.orderedIds
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Achiever categories reordered successfully.",
+        data: categories,
+    });
+};
+
 module.exports = {
     createCategory,
     getCategories,
     updateCategory,
     deleteCategory,
+    reorderCategories,
 };

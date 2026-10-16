@@ -127,6 +127,20 @@ const deleteCategory = async (
     });
 };
 
+// Reorder Categories
+
+const reorderCategories = async (req, res) => {
+    const result = await blogCategoryService.reorderCategories(
+        req.body.orderedIds
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Blog categories reordered successfully",
+        data: result.categories,
+    });
+};
+
 module.exports = {
     createCategory,
     getPublicCategories,
@@ -135,4 +149,5 @@ module.exports = {
     updateCategory,
     updateCategoryStatus,
     deleteCategory,
+    reorderCategories,
 };

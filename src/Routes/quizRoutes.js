@@ -15,6 +15,7 @@ const {
   getPublicQuizCategories,
   createQuizCategory,
   updateQuizCategory,
+  reorderQuizCategories,
   deleteQuizCategory,
   getQuizSetting,
   updateQuizSetting,
@@ -150,6 +151,22 @@ router.get(
   authMiddleware,
   authorize("superAdmin", "admin"),
   asyncHandler(getQuizCategories)
+);
+
+router.put(
+  "/categories/reorder",
+  authMiddleware,
+  authorize("superAdmin", "admin"),
+  csrfMiddleware,
+  asyncHandler(reorderQuizCategories)
+);
+
+router.patch(
+  "/categories/reorder",
+  authMiddleware,
+  authorize("superAdmin", "admin"),
+  csrfMiddleware,
+  asyncHandler(reorderQuizCategories)
 );
 
 router.get(

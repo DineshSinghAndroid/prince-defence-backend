@@ -243,10 +243,22 @@ const createCategory = async (data) => {
         }
     }
 
+    let order = categoryData.order;
+    if (order === undefined) {
+        const lastCategory = await BlogCategory.findOne()
+            .sort({ order: -1 })
+            .select("order");
+        order =
+            lastCategory && typeof lastCategory.order === "number"
+                ? lastCategory.order + 1
+                : 0;
+    }
+
     try {
         return await BlogCategory.create({
             name: normalizedName,
             slug: normalizedSlug,
+            order,
         });
     } catch (error) {
         if (error.code === 11000) {
@@ -302,6 +314,7 @@ const getPublicCategories = async (
     ] = await Promise.all([
         BlogCategory.find(filter)
             .sort({
+                order: 1,
                 name: 1,
                 _id: 1,
             })
@@ -386,6 +399,7 @@ const getAdminCategories = async (
     ] = await Promise.all([
         BlogCategory.find(filter)
             .sort({
+                order: 1,
                 createdAt: -1,
                 _id: -1,
             })
@@ -626,6 +640,23 @@ const deleteCategory = async (
     return category;
 };
 
+const reorderCategories = async (orderedIds) => {
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+        throw new ApiError(400, "orderedIds must be a non-empty array of IDs.");
+    }
+
+    const bulkOps = orderedIds.map((id, index) => ({
+        updateOne: {
+            filter: { _id: id },
+            update: { $set: { order: index } },
+        },
+    }));
+
+    await BlogCategory.bulkWrite(bulkOps);
+
+    return getAdminCategories({ limit: 50 });
+};
+
 module.exports = {
     createCategory,
     getPublicCategories,
@@ -634,4 +665,5 @@ module.exports = {
     updateCategory,
     updateCategoryStatus,
     deleteCategory,
+    reorderCategories,
 };

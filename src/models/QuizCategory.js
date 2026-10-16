@@ -4,6 +4,7 @@ const quizCategorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 80 },
     normalizedName: { type: String, required: true, unique: true, index: true },
+    order: { type: Number, default: 0, index: true },
     active: { type: Boolean, default: true, index: true },
   },
   { timestamps: true, collection: "quiz_categories" }

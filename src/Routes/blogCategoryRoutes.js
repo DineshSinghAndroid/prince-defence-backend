@@ -8,6 +8,7 @@ const {
     updateCategory,
     updateCategoryStatus,
     deleteCategory,
+    reorderCategories,
 } = require("../controllers/blogCategoryController");
 
 const authMiddleware =
@@ -42,6 +43,21 @@ router.post(
     authMiddleware,
     authorize("superAdmin", "admin"),
     asyncHandler(createCategory)
+);
+
+// Reorder Categories (placed before /:id)
+router.put(
+    "/reorder",
+    authMiddleware,
+    authorize("superAdmin", "admin"),
+    asyncHandler(reorderCategories)
+);
+
+router.patch(
+    "/reorder",
+    authMiddleware,
+    authorize("superAdmin", "admin"),
+    asyncHandler(reorderCategories)
 );
 
 router.get(

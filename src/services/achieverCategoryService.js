@@ -33,11 +33,18 @@ const generateUniqueSlug = async (name, excludeId = null) => {
 const createCategory = async (data) => {
     const slug = await generateUniqueSlug(data.name);
 
+    let order = data.order;
+    if (order === undefined) {
+        const lastCategory = await AchieverCategory.findOne().sort({ order: -1 }).select("order");
+        order = lastCategory && typeof lastCategory.order === "number" ? lastCategory.order + 1 : 0;
+    }
+
     try {
         return await AchieverCategory.create({
             name: data.name,
             slug,
             isActive: data.isActive ?? true,
+            order,
         });
     } catch (error) {
         if (error.code === 11000) {
@@ -50,7 +57,7 @@ const createCategory = async (data) => {
 const getCategories = async (includeInactive = false) => {
     const filter = includeInactive ? {} : { isActive: true };
 
-    return AchieverCategory.find(filter).sort({ name: 1 });
+    return AchieverCategory.find(filter).sort({ order: 1, createdAt: 1 });
 };
 
 const updateCategory = async (id, data) => {
@@ -69,6 +76,10 @@ const updateCategory = async (id, data) => {
         category.isActive = data.isActive;
     }
 
+    if (data.order !== undefined) {
+        category.order = Number(data.order);
+    }
+
     try {
         await category.save();
         return category;
@@ -78,6 +89,23 @@ const updateCategory = async (id, data) => {
         }
         throw error;
     }
+};
+
+const reorderCategories = async (orderedIds) => {
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+        throw new ApiError(400, "orderedIds must be a non-empty array of IDs.");
+    }
+
+    const bulkOps = orderedIds.map((id, index) => ({
+        updateOne: {
+            filter: { _id: id },
+            update: { $set: { order: index } },
+        },
+    }));
+
+    await AchieverCategory.bulkWrite(bulkOps);
+
+    return getCategories(true);
 };
 
 const deleteCategory = async (id) => {
@@ -108,4 +136,5 @@ module.exports = {
     getCategories,
     updateCategory,
     deleteCategory,
+    reorderCategories,
 };

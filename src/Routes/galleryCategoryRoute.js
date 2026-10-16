@@ -7,6 +7,7 @@ const {
     editGalleryCategory,
     changeGalleryCategoryStatus,
     removeGalleryCategory,
+    reorderCategories,
 } = require("../controllers/galleryCategoryController");
 
 const asyncHandler = require("../utils/asyncHandler");
@@ -38,6 +39,21 @@ router.get(
     "/",
    
     asyncHandler(fetchGalleryCategories)
+);
+
+// Reorder Categories (defined before /:id)
+router.put(
+    "/reorder",
+    authMiddleware,
+    authorize("superAdmin", "admin"),
+    asyncHandler(reorderCategories)
+);
+
+router.patch(
+    "/reorder",
+    authMiddleware,
+    authorize("superAdmin", "admin"),
+    asyncHandler(reorderCategories)
 );
 
 

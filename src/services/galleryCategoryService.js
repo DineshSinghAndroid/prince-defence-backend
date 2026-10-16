@@ -27,9 +27,21 @@ const createGalleryCategory = async (categoryData) => {
         );
     }
 
+    let order = categoryData.order;
+    if (order === undefined) {
+        const lastCategory = await GalleryCategory.findOne()
+            .sort({ order: -1 })
+            .select("order");
+        order =
+            lastCategory && typeof lastCategory.order === "number"
+                ? lastCategory.order + 1
+                : 0;
+    }
+
     const category = await GalleryCategory.create({
         name,
         slug,
+        order,
     });
 
     return category;
@@ -37,7 +49,7 @@ const createGalleryCategory = async (categoryData) => {
 
 const getGalleryCategories = async () => {
     const categories = await GalleryCategory.find()
-        .sort({ createdAt: -1 });
+        .sort({ order: 1, createdAt: 1 });
 
     return categories;
 };
@@ -165,6 +177,24 @@ const deleteGalleryCategory = async (id) => {
 
     return category;
 };
+
+const reorderGalleryCategories = async (orderedIds) => {
+    if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+        throw new ApiError(400, "orderedIds must be a non-empty array of IDs.");
+    }
+
+    const bulkOps = orderedIds.map((id, index) => ({
+        updateOne: {
+            filter: { _id: id },
+            update: { $set: { order: index } },
+        },
+    }));
+
+    await GalleryCategory.bulkWrite(bulkOps);
+
+    return getGalleryCategories();
+};
+
 module.exports = {
     createGalleryCategory,
     getGalleryCategories,
@@ -172,4 +202,5 @@ module.exports = {
     updateGalleryCategory,
     updateGalleryCategoryStatus,
     deleteGalleryCategory,
+    reorderGalleryCategories,
 };

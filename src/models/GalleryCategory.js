@@ -25,7 +25,12 @@ const galleryCategorySchema = new mongoose.Schema({
        
         trim:true,
         maxlength:150
-    }
+    },
+    order: {
+        type: Number,
+        default: 0,
+        index: true,
+    },
 },
 {timestamps:true}
 )

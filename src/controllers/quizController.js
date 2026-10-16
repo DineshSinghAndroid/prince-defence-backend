@@ -385,6 +385,23 @@ const updateQuizCategory = async (req, res) => {
   return res.status(200).json({ success: true, message: "Quiz category updated successfully.", category: result });
 };
 
+const reorderQuizCategories = async (req, res) => {
+  const { orderedIds } = req.body;
+  if (!Array.isArray(orderedIds)) {
+    return res.status(400).json({
+      success: false,
+      message: "orderedIds array is required",
+    });
+  }
+
+  const categories = await quizService.reorderQuizCategories(orderedIds);
+  return res.status(200).json({
+    success: true,
+    message: "Quiz categories reordered successfully",
+    categories,
+  });
+};
+
 const deleteQuizCategory = async (req, res) => {
   const result = await quizService.deleteQuizCategory(
     req.params.categoryId
@@ -663,6 +680,7 @@ module.exports = {
   getPublicQuizCategories,
   createQuizCategory,
   updateQuizCategory,
+  reorderQuizCategories,
   deleteQuizCategory,
   getQuizSetting,
   updateQuizSetting,

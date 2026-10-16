@@ -5,6 +5,7 @@ const {
     updateGalleryCategory,
     updateGalleryCategoryStatus,
     deleteGalleryCategory,
+    reorderGalleryCategories,
 } = require("../services/galleryCategoryService");
 
 const addGalleryCategory = async (req, res) => {
@@ -77,6 +78,18 @@ const removeGalleryCategory = async (req, res) => {
     });
 };
 
+const reorderCategories = async (req, res) => {
+    const categories = await reorderGalleryCategories(
+        req.body.orderedIds
+    );
+
+    res.status(200).json({
+        success: true,
+        message: "Gallery categories reordered successfully",
+        data: categories,
+    });
+};
+
 module.exports = {
     addGalleryCategory,
     fetchGalleryCategories,
@@ -84,4 +97,5 @@ module.exports = {
     editGalleryCategory,
     changeGalleryCategoryStatus,
     removeGalleryCategory,
+    reorderCategories,
 };
