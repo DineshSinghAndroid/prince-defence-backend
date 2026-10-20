@@ -5,10 +5,17 @@ const authMiddleware = require("../middleware/authMiddleware")
 const authorize = require("../middleware/roleMiddleware")
 const validate = require("../middleware/validateMiddleware")
 const loginSchema = require("../validators/authValidator")
+const rateLimit = require("../middleware/rateLimit")
 
 const router = express.Router()
 
-router.post("/login",validate(loginSchema),asyncHandler(loginAdmin))
+const loginRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: "Too many login attempts from this IP. Please try again after 15 minutes.",
+});
+
+router.post("/login", loginRateLimiter, validate(loginSchema), asyncHandler(loginAdmin))
 router.get("/me",authMiddleware,authorize("superAdmin","admin"),getme)
 router.get("/csrf",authMiddleware,authorize("superAdmin","admin"),getCsrfToken)
 router.post("/logout", authMiddleware, asyncHandler(logoutAdmin));

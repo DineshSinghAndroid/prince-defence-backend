@@ -14,14 +14,21 @@ const asyncHandler = require("../utils/asyncHandler");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const authorize = require("../middleware/roleMiddleware");
+const rateLimit = require("../middleware/rateLimit");
 
 const router = express.Router();
 
+const contactSubmitLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: "Too many enquiries submitted from this IP. Please try again after 15 minutes.",
+});
 
 // PUBLIC
 // Submit enquiries from the website.
 router.post(
     "/",
+    contactSubmitLimit,
     validate(contactSchema),
     asyncHandler(submitContact)
 );

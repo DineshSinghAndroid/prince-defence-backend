@@ -4,6 +4,10 @@ const ApiError = require("../utils/ApiError")
 
 
 
+const escapeRegex = (value) => {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 const createContact = async (contactData) =>{
     const existingContact = await Contact.findOne({
         name:contactData.name, number:contactData.number, course:contactData.course
@@ -22,18 +26,21 @@ const getContact = async (page=1,limit=10,search="",course="",status="") =>{
 
     let filter = {}
 
-    if(search){
-        filter ={
-            $or: [{name:{$regex:search, $options:"i"}},{number:{$regex:search, $options:"i"}},{course:{$regex:search, $options:"i"}}]
-        }
+    if (typeof search === "string" && search.trim()) {
+        const safeSearch = escapeRegex(search.trim().slice(0, 100));
+        filter.$or = [
+            { name: { $regex: safeSearch, $options: "i" } },
+            { number: { $regex: safeSearch, $options: "i" } },
+            { course: { $regex: safeSearch, $options: "i" } },
+        ];
     }
 
-    if(status){
-        filter.status = {$regex:status, $options:"i"}
+    if (typeof status === "string" && status.trim()) {
+        filter.status = { $regex: escapeRegex(status.trim().slice(0, 30)), $options: "i" };
     }
 
-    if(course){
-        filter.course = {$regex:course, $options:"i"}
+    if (typeof course === "string" && course.trim()) {
+        filter.course = { $regex: escapeRegex(course.trim().slice(0, 80)), $options: "i" };
     }
 
 

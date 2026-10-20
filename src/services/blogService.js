@@ -757,6 +757,7 @@ const getPublicBlogs = async (
         limit = 10,
         search,
         category,
+        categorySlug,
         excludeCategory,
         excludeCategorySlug,
     } = query;
@@ -797,11 +798,90 @@ const getPublicBlogs = async (
         ];
     }
 
-    if (category) {
-        validateCategoryId(category);
+    let targetCategoryId = category;
 
-        filter.category =
-            category;
+    if (
+        typeof categorySlug === "string" &&
+        categorySlug.trim()
+    ) {
+        const foundCategory =
+            await BlogCategory.findOne({
+                $or: [
+                    {
+                        slug: categorySlug
+                            .trim()
+                            .toLowerCase(),
+                    },
+                    {
+                        name: new RegExp(
+                            `^${escapeRegex(
+                                categorySlug.trim()
+                            )}$`,
+                            "i"
+                        ),
+                    },
+                ],
+            })
+                .select("_id")
+                .lean();
+
+        if (foundCategory) {
+            targetCategoryId = foundCategory._id.toString();
+        } else {
+            return {
+                blogs: [],
+                pagination: {
+                    page,
+                    limit,
+                    totalBlogs: 0,
+                    totalPages: 0,
+                },
+            };
+        }
+    } else if (
+        typeof targetCategoryId === "string" &&
+        targetCategoryId.trim() &&
+        !isValidObjectId(targetCategoryId)
+    ) {
+        const foundCategory =
+            await BlogCategory.findOne({
+                $or: [
+                    {
+                        slug: targetCategoryId
+                            .trim()
+                            .toLowerCase(),
+                    },
+                    {
+                        name: new RegExp(
+                            `^${escapeRegex(
+                                targetCategoryId.trim()
+                            )}$`,
+                            "i"
+                        ),
+                    },
+                ],
+            })
+                .select("_id")
+                .lean();
+
+        if (foundCategory) {
+            targetCategoryId = foundCategory._id.toString();
+        } else {
+            return {
+                blogs: [],
+                pagination: {
+                    page,
+                    limit,
+                    totalBlogs: 0,
+                    totalPages: 0,
+                },
+            };
+        }
+    }
+
+    if (targetCategoryId) {
+        validateCategoryId(targetCategoryId);
+        filter.category = targetCategoryId;
     }
 
     let excludedCategoryId = excludeCategory;
@@ -838,11 +918,11 @@ const getPublicBlogs = async (
     if (excludedCategoryId) {
         validateCategoryId(excludedCategoryId);
 
-        if (category === excludedCategoryId) {
+        if (targetCategoryId === excludedCategoryId) {
             filter._id = { $exists: false };
-        } else if (category) {
+        } else if (targetCategoryId) {
             filter.$and = [
-                { category },
+                { category: targetCategoryId },
                 { category: { $ne: excludedCategoryId } },
             ];
             delete filter.category;
@@ -874,6 +954,9 @@ const getPublicBlogs = async (
             .populate(
                 "author",
                 "name"
+            )
+            .select(
+                "title slug excerpt featuredImage publishedAt category author createdAt updatedAt"
             )
             .lean(),
 
@@ -976,6 +1059,9 @@ const getAdminBlogs = async (
             .populate(
                 "author",
                 "name"
+            )
+            .select(
+                "title slug excerpt featuredImage status publishedAt category author createdAt updatedAt"
             )
             .lean(),
 

@@ -398,6 +398,13 @@ blogSchema.index({
 blogSchema.index({
     status: 1,
     category: 1,
+    publishedAt: -1,
+    _id: -1,
+});
+
+blogSchema.index({
+    status: 1,
+    category: 1,
     createdAt: -1,
     _id: -1,
 });
