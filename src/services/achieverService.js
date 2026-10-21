@@ -52,7 +52,13 @@ const listAchievers = async (
     }
 
     if (year) filter.year = Number(year);
-    if (batch) filter.batch = batch;
+    if (batch) {
+        if (batch === "null" || batch === "none") {
+            filter.batch = { $in: ["null", "none", null, ""] };
+        } else {
+            filter.batch = batch;
+        }
+    }
 
     if (search) {
         const regex = new RegExp(escapeRegex(search.trim()), "i");

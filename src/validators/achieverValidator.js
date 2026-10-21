@@ -1,7 +1,7 @@
 
 const Joi = require("joi");
 
-const batches = ["foundation", "target"];
+const batches = ["foundation", "target", "null", "none"];
 
 const createAchieverSchema = Joi.object({
     name: Joi.string().trim().min(2).max(150).required(),
@@ -9,7 +9,12 @@ const createAchieverSchema = Joi.object({
     address: Joi.string().trim().min(3).max(300).required(),
     examName: Joi.string().trim().min(2).max(150).required(),
     year: Joi.number().integer().min(2000).max(2100).required(),
-    batch: Joi.string().trim().lowercase().valid(...batches).required(),
+    batch: Joi.string()
+        .trim()
+        .lowercase()
+        .valid(...batches)
+        .allow("", null)
+        .default("null"),
     isPublished: Joi.boolean().default(true),
     displayOrder: Joi.number().integer().min(0).default(0),
 }).unknown(false);
@@ -21,7 +26,11 @@ const updateAchieverSchema = Joi.object({
     categorySlug: Joi.string().trim().lowercase().max(100),
     examName: Joi.string().trim().min(2).max(150),
     year: Joi.number().integer().min(2000).max(2100),
-    batch: Joi.string().trim().lowercase().valid(...batches),
+    batch: Joi.string()
+        .trim()
+        .lowercase()
+        .valid(...batches)
+        .allow("", null),
     isPublished: Joi.boolean(),
     displayOrder: Joi.number().integer().min(0),
 })
@@ -32,7 +41,11 @@ const listAchieversSchema = Joi.object({
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(12),
     year: Joi.number().integer().min(2000).max(2100),
-    batch: Joi.string().trim().lowercase().valid(...batches),
+    batch: Joi.string()
+        .trim()
+        .lowercase()
+        .valid(...batches)
+        .allow(""),
     search: Joi.string().trim().max(100).allow(""),
     sort: Joi.string()
         .valid("newest", "oldest", "name", "order")

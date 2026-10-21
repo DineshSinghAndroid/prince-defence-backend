@@ -41,8 +41,10 @@ const achieverSchema = new mongoose.Schema(
         },
         batch: {
             type: String,
-            required: [true, "Batch is required"],
-            enum: ["foundation", "target"],
+            trim: true,
+            lowercase: true,
+            enum: ["foundation", "target", "null", "none"],
+            default: "target",
         },
         photo: {
             url: {
