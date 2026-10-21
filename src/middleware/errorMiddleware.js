@@ -6,10 +6,11 @@ const errorMiddleware = (
     res,
     next
 ) => {
-    console.error(
-        "ERROR:",
-        err
-    );
+    if (err.statusCode && err.statusCode < 500) {
+        console.warn(`[ClientError ${err.statusCode}] ${err.message}`);
+    } else {
+        console.error("ERROR:", err);
+    }
 
     if (
         err instanceof multer.MulterError

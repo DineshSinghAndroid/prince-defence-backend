@@ -56,7 +56,7 @@ const recordFailedLogin = async (adminId, now) =>
                 },
             },
         ],
-        { returnDocument: "after" }
+        { returnDocument: "after", updatePipeline: true }
     );
 
 // LOGIN ADMIN

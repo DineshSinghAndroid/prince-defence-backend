@@ -2,6 +2,15 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 const ApiError = require("../utils/ApiError");
 
+const clearAuthCookie = (res) => {
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/",
+    });
+};
+
 const authMiddleware = async (req, res, next) => {
     try {
         // 1. GET TOKEN FROM COOKIE
@@ -27,6 +36,7 @@ const authMiddleware = async (req, res, next) => {
         // 3. CHECK USER ID
 
         if (!decoded?.id) {
+            clearAuthCookie(res);
             throw new ApiError(
                 401,
                 "Invalid authentication token"
@@ -41,6 +51,7 @@ const authMiddleware = async (req, res, next) => {
         ).select("-password");
 
         if (!admin) {
+            clearAuthCookie(res);
             throw new ApiError(
                 401,
                 "Admin account not found"
@@ -48,6 +59,7 @@ const authMiddleware = async (req, res, next) => {
         }
 
         if ((decoded.sessionVersion ?? 0) !== (admin.sessionVersion ?? 0)) {
+            clearAuthCookie(res);
             throw new ApiError(
                 401,
                 "Authentication session has been revoked"
@@ -86,6 +98,7 @@ const authMiddleware = async (req, res, next) => {
         // JWT ERROR
 
         if (error.name === "JsonWebTokenError") {
+            clearAuthCookie(res);
             return next(
                 new ApiError(
                     401,
@@ -98,6 +111,7 @@ const authMiddleware = async (req, res, next) => {
         // EXPIRED JWT
 
         if (error.name === "TokenExpiredError") {
+            clearAuthCookie(res);
             return next(
                 new ApiError(
                     401,
