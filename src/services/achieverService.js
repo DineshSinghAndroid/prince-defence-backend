@@ -72,10 +72,10 @@ const listAchievers = async (
     }
 
     const sortOptions = {
-        newest: { year: -1, createdAt: -1, _id: -1 },
-        oldest: { year: 1, createdAt: 1, _id: 1 },
+        order: { displayOrder: -1, year: -1, createdAt: -1, _id: -1 },
+        newest: { displayOrder: -1, year: -1, createdAt: -1, _id: -1 },
+        oldest: { displayOrder: -1, year: 1, createdAt: 1, _id: 1 },
         name: { name: 1, _id: 1 },
-        order: { displayOrder: 1, year: -1, _id: -1 },
     };
 
     const currentPage = Math.max(1, Number(page) || 1);
@@ -87,7 +87,7 @@ const listAchievers = async (
         Achiever.find(filter)
             .select("-__v")
             .populate("categoryId", "name slug")
-            .sort(sortOptions[sort] || sortOptions.newest)
+            .sort(sortOptions[sort] || sortOptions.order)
             .skip((currentPage - 1) * pageLimit)
             .limit(pageLimit)
             .lean(),

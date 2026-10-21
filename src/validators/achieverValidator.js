@@ -49,7 +49,7 @@ const listAchieversSchema = Joi.object({
     search: Joi.string().trim().max(100).allow(""),
     sort: Joi.string()
         .valid("newest", "oldest", "name", "order")
-        .default("newest"),
+        .default("order"),
 });
 
 const adminListAchieversSchema = listAchieversSchema.keys({
