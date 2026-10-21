@@ -69,9 +69,18 @@ const achieverSchema = new mongoose.Schema(
 );
 
 achieverSchema.index({
+    isPublished: 1,
+    year: -1,
+    createdAt: -1,
+    _id: -1,
+});
+
+achieverSchema.index({
     categoryId: 1,
     isPublished: 1,
     year: -1,
+    createdAt: -1,
+    _id: -1,
 });
 
 module.exports = mongoose.model("Achiever", achieverSchema);

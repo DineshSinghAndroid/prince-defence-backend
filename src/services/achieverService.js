@@ -66,10 +66,10 @@ const listAchievers = async (
     }
 
     const sortOptions = {
-        newest: { year: -1, createdAt: -1 },
-        oldest: { year: 1, createdAt: 1 },
-        name: { name: 1 },
-        order: { displayOrder: 1, year: -1 },
+        newest: { year: -1, createdAt: -1, _id: -1 },
+        oldest: { year: 1, createdAt: 1, _id: 1 },
+        name: { name: 1, _id: 1 },
+        order: { displayOrder: 1, year: -1, _id: -1 },
     };
 
     const currentPage = Math.max(1, Number(page) || 1);
