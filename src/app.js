@@ -10,8 +10,8 @@ const authRoutes = require("./Routes/authRoutes");
 const adminRoutes = require("./Routes/adminRoutes");
 const galleryRoutes = require("./Routes/galleryRoutes");
 const galleryCategoryRoutes = require("./Routes/galleryCategoryRoute");
-const blogRoutes = require("./Routes/blogRoutes");
-const blogCategoryRoutes = require("./Routes/blogCategoryRoutes");
+// const blogRoutes = require("./Routes/blogRoutes");
+// const blogCategoryRoutes = require("./Routes/blogCategoryRoutes");
 const dashboardRoutes = require("./Routes/dashboardRoutes");
 const passwordResetRoutes = require("./Routes/passwordResetRoutes");
 const quizRoutes = require("./Routes/quizRoutes");
@@ -19,6 +19,7 @@ const analyticsRoutes = require("./Routes/analyticsRoutes");
 const achieverRoutes = require("./Routes/achieverRoutes");
 const achieverCategoryRoutes = require("./Routes/achieverCategoryRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
+const ApiError = require("./utils/ApiError");
 
 const app = express();
 
@@ -51,7 +52,7 @@ app.use(
                 return callback(null, true);
             }
 
-            return callback(new Error("Origin is not allowed by CORS"));
+            return callback(new ApiError(403, "Origin is not allowed by CORS"));
         },
         credentials: true,
         maxAge: 600,
@@ -68,8 +69,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/gallery", galleryRoutes);
 app.use("/api/gallery-categories", galleryCategoryRoutes);
-app.use("/api/blogs", blogRoutes);
-app.use("/api/blog-categories", blogCategoryRoutes);
+// app.use("/api/blogs", blogRoutes);
+// app.use("/api/blog-categories", blogCategoryRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/analytics", analyticsRoutes);

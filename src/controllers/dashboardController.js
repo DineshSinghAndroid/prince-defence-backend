@@ -2,6 +2,8 @@ const Admin = require("../models/Admin");
 const Contact = require("../models/Contacts");
 const Gallery = require("../models/Gallery");
 const GalleryCategory = require("../models/GalleryCategory");
+const Achiever = require("../models/Achiever");
+// const Blog = require("../models/Blog");
 const Visitor = require("../models/Visitor");
 const PageView = require("../models/PageView");
 const QuizAttempt = require("../models/QuizAttempt");
@@ -13,6 +15,8 @@ const getDashboardStats = async (req, res) => {
         totalContacts: 0,
         totalGalleryImages: 0,
         totalGalleryCategories: 0,
+        totalAchievers: 0,
+        totalBlogs: 0,
         totalVisitors: 0,
         totalPageViews: 0,
         totalQuizAttempts: 0,
@@ -36,6 +40,8 @@ const getDashboardStats = async (req, res) => {
         totalContacts,
         totalGalleryImages,
         totalGalleryCategories,
+        totalAchievers,
+        totalBlogs,
         totalVisitors,
         totalPageViews,
         totalQuizAttempts,
@@ -47,6 +53,9 @@ const getDashboardStats = async (req, res) => {
         Contact.countDocuments(),
         Gallery.countDocuments(),
         GalleryCategory.countDocuments(),
+        Achiever.countDocuments(),
+        // Blog.countDocuments(),
+        0,
         Visitor.countDocuments(),
         PageView.countDocuments(),
         QuizAttempt.countDocuments(),
@@ -74,6 +83,8 @@ const getDashboardStats = async (req, res) => {
             totalContacts,
             totalGalleryImages,
             totalGalleryCategories,
+            totalAchievers,
+            // totalBlogs,
             totalVisitors,
             totalPageViews,
             totalQuizAttempts,

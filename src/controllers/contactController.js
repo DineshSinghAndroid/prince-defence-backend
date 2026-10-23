@@ -38,7 +38,7 @@ const fetchContacts = async (req,res)=>{
 
     const result = await getContact(page,limit,search,course,status)
 
-    res.status(201).json({
+    res.status(200).json({
         success:true,
         message:"Enquiries Fetch Successfully",
         data: result.contacts,
@@ -53,7 +53,7 @@ const fetchContacts = async (req,res)=>{
 
 const fetchContactById = async (req,res) =>{
     const contact = await getContactById(req.params.id)
-    res.status(201).json({
+    res.status(200).json({
         success:true,
         message:"Enquiry Fetch Successfully ",
         data:contact
@@ -65,7 +65,7 @@ const updateStatus = async(req,res)=>{
     
     const contact = await updateEnquiryStatus(req.params.id,status)
 
-    res.status(201).json({
+    res.status(200).json({
         success:true,
         message:"Enquiry Updated Successfully",
         data:contact
@@ -75,7 +75,7 @@ const updateStatus = async(req,res)=>{
 const deleteContact = async(req,res)=>{
     const contact = await deleteEnquiry(req.params.id)
 
-    res.status(201).json({
+    res.status(200).json({
         success:true,
         message:"Enquiry Deleted Successfully",
         data:contact

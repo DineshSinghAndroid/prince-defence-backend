@@ -1,56 +1,56 @@
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 
-const blogCategorySchema = new mongoose.Schema(
-    {
-        name: {
-            type: String,
-            required: true,
-            unique: true,
-            trim: true,
-            maxlength: 100,
-        },
+// const blogCategorySchema = new mongoose.Schema(
+//     {
+//         name: {
+//             type: String,
+//             required: true,
+//             unique: true,
+//             trim: true,
+//             maxlength: 100,
+//         },
 
-        slug: {
-            type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
-            trim: true,
-            maxlength: 100,
-        },
+//         slug: {
+//             type: String,
+//             required: true,
+//             unique: true,
+//             lowercase: true,
+//             trim: true,
+//             maxlength: 100,
+//         },
 
-        isActive: {
-            type: Boolean,
-            default: true,
-        },
+//         isActive: {
+//             type: Boolean,
+//             default: true,
+//         },
 
-        order: {
-            type: Number,
-            default: 0,
-            index: true,
-        },
-    },
-    {
-        timestamps: true,
-    }
-);
+//         order: {
+//             type: Number,
+//             default: 0,
+//             index: true,
+//         },
+//     },
+//     {
+//         timestamps: true,
+//     }
+// );
 
-// Indexes
+// // Indexes
 
-blogCategorySchema.index({
-    isActive: 1,
-    name: 1,
-});
+// blogCategorySchema.index({
+//     isActive: 1,
+//     name: 1,
+// });
 
-blogCategorySchema.index({
-    isActive: 1,
-    createdAt: -1,
-    _id: -1,
-});
+// blogCategorySchema.index({
+//     isActive: 1,
+//     createdAt: -1,
+//     _id: -1,
+// });
 
-const BlogCategory = mongoose.model(
-    "BlogCategory",
-    blogCategorySchema
-);
+// const BlogCategory = mongoose.model(
+//     "BlogCategory",
+//     blogCategorySchema
+// );
 
-module.exports = BlogCategory;
+// module.exports = BlogCategory;

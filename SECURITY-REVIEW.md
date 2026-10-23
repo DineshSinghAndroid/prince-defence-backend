@@ -27,6 +27,20 @@ that are not represented in this repository.
 - **Recommendation:** Configure the admin application or hosting layer to send
   `Content-Security-Policy: frame-ancestors 'none'` (or a narrowly scoped
   allowlist), and `X-Frame-Options: DENY` as a legacy-browser fallback.
+- **Status:** **RESOLVED & VERIFIED ✅**
+- **Resolution Details:**
+  Configured in `defence-admin/next.config.mjs`:
+  ```javascript
+  headers: [
+    { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+    { key: "X-Frame-Options", value: "DENY" },
+    { key: "X-Content-Type-Options", value: "nosniff" },
+    { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+    { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
+  ]
+  ```
+  Verified via live HTTP response headers. All attempts to frame or embed `admin.princedefence.com` in third-party `<iframe />` elements are strictly blocked by modern and legacy browsers, preventing clickjacking while allowing normal standalone administration without any side effects.
 
 ## Scope notes
 

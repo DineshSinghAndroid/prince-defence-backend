@@ -32,8 +32,9 @@ const sendPasswordResetOtp = async (
         });
 
     if (error) {
+        console.error("[EmailService Error] Resend failed to send password reset OTP:", error);
         throw new Error(
-            "Failed to send password reset email"
+            error.message || "Failed to send password reset email"
         );
     }
 
