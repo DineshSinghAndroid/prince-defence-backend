@@ -19,7 +19,9 @@ const addGalleryCategory = async (req, res) => {
 };
 
 const fetchGalleryCategories = async (req, res) => {
-    const categories = await getGalleryCategories();
+    const categories = await getGalleryCategories({
+        includeGallerySummary: req.query.includeGallerySummary === "true",
+    });
 
     res.status(200).json({
         success: true,

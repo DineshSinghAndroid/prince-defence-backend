@@ -47,11 +47,42 @@ const createGalleryCategory = async (categoryData) => {
     return category;
 };
 
-const getGalleryCategories = async () => {
+const getGalleryCategories = async ({ includeGallerySummary = false } = {}) => {
     const categories = await GalleryCategory.find()
         .sort({ order: 1, createdAt: 1 });
 
-    return categories;
+    if (!includeGallerySummary) {
+        return categories;
+    }
+
+    const summaries = await Gallery.aggregate([
+        { $sort: { createdAt: -1 } },
+        {
+            $group: {
+                _id: "$category",
+                imageCount: { $sum: 1 },
+                coverImageUrl: { $first: "$imageUrl" },
+                coverAlt: { $first: "$alt" },
+            },
+        },
+    ]);
+    const summaryByCategory = new Map(
+        summaries.map((summary) => [
+            String(summary._id),
+            summary,
+        ])
+    );
+
+    return categories.map((category) => {
+        const summary = summaryByCategory.get(String(category._id));
+
+        return {
+            ...category.toObject(),
+            imageCount: summary?.imageCount || 0,
+            coverImageUrl: summary?.coverImageUrl || "",
+            coverAlt: summary?.coverAlt || category.name,
+        };
+    });
 };
 
 const getGalleryCategoryById = async (id) => {
