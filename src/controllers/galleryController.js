@@ -52,6 +52,8 @@ const fetchGallery = async (
             limit
         );
 
+    // Cache-Control header for public gallery results (3 min cache)
+    res.set("Cache-Control", "public, max-age=180, stale-while-revalidate=360");
 
     res.status(200).json({
 

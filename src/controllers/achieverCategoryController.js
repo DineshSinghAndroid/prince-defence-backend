@@ -18,6 +18,11 @@ const getCategories = async (req, res) => {
         includeInactive
     );
 
+    // Cache-Control header for public queries (5 min CDN/browser cache)
+    if (!includeInactive) {
+        res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=600");
+    }
+
     res.status(200).json({
         success: true,
         message: "Achiever categories fetched successfully.",

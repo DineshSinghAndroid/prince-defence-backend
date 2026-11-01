@@ -35,6 +35,9 @@ const getPublicAchievers = asyncHandler(async (req, res) => {
         categorySlug: req.params.categorySlug,
     });
 
+    // Cache-Control header for public queries (3 min CDN/browser cache)
+    res.set("Cache-Control", "public, max-age=180, stale-while-revalidate=360");
+
     res.status(200).json({
         success: true,
         message: "Achievers fetched successfully.",

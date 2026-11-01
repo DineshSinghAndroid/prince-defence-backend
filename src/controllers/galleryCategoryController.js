@@ -23,6 +23,9 @@ const fetchGalleryCategories = async (req, res) => {
         includeGallerySummary: req.query.includeGallerySummary === "true",
     });
 
+    // Cache-Control header for public gallery categories (5 min cache)
+    res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=600");
+
     res.status(200).json({
         success: true,
         message: "Gallery categories fetched successfully",
