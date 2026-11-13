@@ -6,6 +6,7 @@ const batches = ["foundation", "target", "null", "none"];
 const createAchieverSchema = Joi.object({
     name: Joi.string().trim().min(2).max(150).required(),
     fatherName: Joi.string().trim().min(2).max(150).required(),
+    gender: Joi.string().trim().lowercase().valid("male", "female").default("male"),
     address: Joi.string().trim().min(3).max(300).required(),
     examName: Joi.string().trim().min(2).max(150).required(),
     year: Joi.number().integer().min(2000).max(2100).required(),
@@ -22,6 +23,7 @@ const createAchieverSchema = Joi.object({
 const updateAchieverSchema = Joi.object({
     name: Joi.string().trim().min(2).max(150),
     fatherName: Joi.string().trim().min(2).max(150),
+    gender: Joi.string().trim().lowercase().valid("male", "female"),
     address: Joi.string().trim().min(3).max(300),
     categorySlug: Joi.string().trim().lowercase().max(100),
     examName: Joi.string().trim().min(2).max(150),

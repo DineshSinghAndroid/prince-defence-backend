@@ -15,6 +15,11 @@ const achieverSchema = new mongoose.Schema(
             trim: true,
             maxlength: 150,
         },
+        gender: {
+            type: String,
+            enum: ["male", "female"],
+            default: "male",
+        },
         address: {
             type: String,
             required: [true, "Address is required"],
