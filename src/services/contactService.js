@@ -54,6 +54,26 @@ const applyDateRangeFilter = (filter, startDate, endDate) => {
     }
 };
 
+const applyCourseFilter = (filter, course) => {
+    if (typeof course === "string" && course.trim()) {
+        const courseList = course
+            .split(",")
+            .map((c) => c.trim())
+            .filter(Boolean);
+        if (courseList.length > 1) {
+            const regexPattern = courseList
+                .map((c) => escapeRegex(c.slice(0, 80)))
+                .join("|");
+            filter.course = { $regex: regexPattern, $options: "i" };
+        } else if (courseList.length === 1) {
+            filter.course = {
+                $regex: escapeRegex(courseList[0].slice(0, 80)),
+                $options: "i",
+            };
+        }
+    }
+};
+
 const createContact = async (contactData) =>{
     const existingContact = await Contact.findOne({
         name:contactData.name, number:contactData.number, course:contactData.course
@@ -85,9 +105,7 @@ const getContact = async (page=1,limit=10,search="",course="",status="",startDat
         filter.status = { $regex: escapeRegex(status.trim().slice(0, 30)), $options: "i" };
     }
 
-    if (typeof course === "string" && course.trim()) {
-        filter.course = { $regex: escapeRegex(course.trim().slice(0, 80)), $options: "i" };
-    }
+    applyCourseFilter(filter, course);
 
     applyDateRangeFilter(filter, startDate, endDate);
 
@@ -210,9 +228,7 @@ const getAllContactsForExport = async (
         filter.status = { $regex: escapeRegex(status.trim().slice(0, 30)), $options: "i" };
     }
 
-    if (typeof course === "string" && course.trim()) {
-        filter.course = { $regex: escapeRegex(course.trim().slice(0, 80)), $options: "i" };
-    }
+    applyCourseFilter(filter, course);
 
     applyDateRangeFilter(filter, startDate, endDate);
 

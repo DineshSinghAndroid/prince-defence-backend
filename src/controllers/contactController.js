@@ -22,12 +22,14 @@ const submitContact = async (req,res)=>{
 const fetchContacts = async (req,res)=>{
 
     const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10
-    const search = req.query.search || ""
-    const course = req.query.course || ""
-    const status = req.query.status || ""
-    const startDate = req.query.startDate || req.query.from || ""
-    const endDate = req.query.endDate || req.query.to || ""
+    const limit = Number(req.query.limit) || 10;
+    const search = req.query.search || "";
+    const course = Array.isArray(req.query.course)
+        ? req.query.course.join(",")
+        : req.query.course || "";
+    const status = req.query.status || "";
+    const startDate = req.query.startDate || req.query.from || "";
+    const endDate = req.query.endDate || req.query.to || "";
 
     if(page<1){
         return res.status(400).json({
@@ -93,7 +95,9 @@ const deleteContact = async(req,res)=>{
 
 const exportContacts = async (req, res) => {
     const search = req.query.search || "";
-    const course = req.query.course || "";
+    const course = Array.isArray(req.query.course)
+        ? req.query.course.join(",")
+        : req.query.course || "";
     const status = req.query.status || "";
     const startDate = req.query.startDate || req.query.from || "";
     const endDate = req.query.endDate || req.query.to || "";
