@@ -1,4 +1,11 @@
-const {createContact, getContact,getContactById,updateEnquiryStatus,deleteEnquiry} = require("../services/contactService");
+const {
+    createContact,
+    getContact,
+    getContactById,
+    updateEnquiryStatus,
+    deleteEnquiry,
+    getAllContactsForExport,
+} = require("../services/contactService");
 
 
 const submitContact = async (req,res)=>{
@@ -19,6 +26,8 @@ const fetchContacts = async (req,res)=>{
     const search = req.query.search || ""
     const course = req.query.course || ""
     const status = req.query.status || ""
+    const startDate = req.query.startDate || req.query.from || ""
+    const endDate = req.query.endDate || req.query.to || ""
 
     if(page<1){
         return res.status(400).json({
@@ -36,7 +45,7 @@ const fetchContacts = async (req,res)=>{
     }
 
 
-    const result = await getContact(page,limit,search,course,status)
+    const result = await getContact(page,limit,search,course,status,startDate,endDate)
 
     res.status(200).json({
         success:true,
@@ -82,4 +91,28 @@ const deleteContact = async(req,res)=>{
     })
 }
 
-module.exports = {submitContact,fetchContacts,fetchContactById,updateStatus,deleteContact}
+const exportContacts = async (req, res) => {
+    const search = req.query.search || "";
+    const course = req.query.course || "";
+    const status = req.query.status || "";
+    const startDate = req.query.startDate || req.query.from || "";
+    const endDate = req.query.endDate || req.query.to || "";
+
+    const contacts = await getAllContactsForExport(search, course, status, startDate, endDate);
+
+    res.status(200).json({
+        success: true,
+        message: "Enquiries Exported Successfully",
+        data: contacts,
+        total: contacts.length,
+    });
+};
+
+module.exports = {
+    submitContact,
+    fetchContacts,
+    fetchContactById,
+    updateStatus,
+    deleteContact,
+    exportContacts,
+};

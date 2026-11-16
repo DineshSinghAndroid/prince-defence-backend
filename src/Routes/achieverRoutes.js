@@ -10,7 +10,7 @@ const controller = require("../controllers/achieverController");
 
 const adminOnly = [
     authMiddleware,
-    authorize("superAdmin"),
+    authorize("superAdmin", "admin"),
 ];
 
 const adminMutation = [

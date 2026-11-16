@@ -6,6 +6,7 @@ const {
     fetchContactById,
     updateStatus,
     deleteContact,
+    exportContacts,
 } = require("../controllers/contactController");
 
 const validate = require("../middleware/validateMiddleware");
@@ -14,6 +15,7 @@ const asyncHandler = require("../utils/asyncHandler");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const authorize = require("../middleware/roleMiddleware");
+const csrfMiddleware = require("../middleware/csrfMiddleware");
 const rateLimit = require("../middleware/rateLimit");
 
 const router = express.Router();
@@ -45,6 +47,14 @@ router.get(
 
 
 router.get(
+    "/export",
+    authMiddleware,
+    authorize("superAdmin", "admin"),
+    asyncHandler(exportContacts)
+);
+
+
+router.get(
     "/:id",
     authMiddleware,
     authorize("superAdmin", "admin"),
@@ -56,6 +66,7 @@ router.put(
     "/:id",
     authMiddleware,
     authorize("superAdmin", "admin"),
+    csrfMiddleware,
     asyncHandler(updateStatus)
 );
 
@@ -64,6 +75,7 @@ router.delete(
     "/:id",
     authMiddleware,
     authorize("superAdmin", "admin"),
+    csrfMiddleware,
     asyncHandler(deleteContact)
 );
 

@@ -8,6 +8,52 @@ const escapeRegex = (value) => {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
+const parseDateBoundary = (dateStr, isEnd = false) => {
+    if (!dateStr || typeof dateStr !== "string") return null;
+    const trimmed = dateStr.trim();
+    if (!trimmed) return null;
+
+    // Format: YYYY-MM (e.g. "2026-11")
+    if (/^\d{4}-\d{2}$/.test(trimmed)) {
+        const [yearStr, monthStr] = trimmed.split("-");
+        const year = Number(yearStr);
+        const month = Number(monthStr);
+        if (isEnd) {
+            const lastDay = new Date(year, month, 0).getDate();
+            const d = new Date(`${trimmed}-${String(lastDay).padStart(2, "0")}T23:59:59.999+05:30`);
+            return isNaN(d.getTime()) ? null : d;
+        } else {
+            const d = new Date(`${trimmed}-01T00:00:00.000+05:30`);
+            return isNaN(d.getTime()) ? null : d;
+        }
+    }
+
+    // Format: YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+        const timePart = isEnd ? "T23:59:59.999+05:30" : "T00:00:00.000+05:30";
+        const d = new Date(`${trimmed}${timePart}`);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    const d = new Date(trimmed);
+    return isNaN(d.getTime()) ? null : d;
+};
+
+const applyDateRangeFilter = (filter, startDate, endDate) => {
+    const start = parseDateBoundary(startDate, false);
+    const end = parseDateBoundary(endDate, true);
+
+    if (start || end) {
+        filter.createdAt = filter.createdAt || {};
+        if (start) {
+            filter.createdAt.$gte = start;
+        }
+        if (end) {
+            filter.createdAt.$lte = end;
+        }
+    }
+};
+
 const createContact = async (contactData) =>{
     const existingContact = await Contact.findOne({
         name:contactData.name, number:contactData.number, course:contactData.course
@@ -21,7 +67,7 @@ const createContact = async (contactData) =>{
     return contact
 }
 
-const getContact = async (page=1,limit=10,search="",course="",status="") =>{
+const getContact = async (page=1,limit=10,search="",course="",status="",startDate="",endDate="") =>{
     const skip = (page-1)*limit
 
     let filter = {}
@@ -43,6 +89,7 @@ const getContact = async (page=1,limit=10,search="",course="",status="") =>{
         filter.course = { $regex: escapeRegex(course.trim().slice(0, 80)), $options: "i" };
     }
 
+    applyDateRangeFilter(filter, startDate, endDate);
 
     const contacts = await Contact.find(filter).sort({createdAt:-1}).skip(skip).limit(limit)
     const total = await Contact.countDocuments(filter)
@@ -141,4 +188,43 @@ const deleteEnquiry = async (id) => {
     return contact;
 };
 
-module.exports = {createContact,getContact,getContactById,updateEnquiryStatus,deleteEnquiry}
+const getAllContactsForExport = async (
+    search = "",
+    course = "",
+    status = "",
+    startDate = "",
+    endDate = ""
+) => {
+    let filter = {};
+
+    if (typeof search === "string" && search.trim()) {
+        const safeSearch = escapeRegex(search.trim().slice(0, 100));
+        filter.$or = [
+            { name: { $regex: safeSearch, $options: "i" } },
+            { number: { $regex: safeSearch, $options: "i" } },
+            { course: { $regex: safeSearch, $options: "i" } },
+        ];
+    }
+
+    if (typeof status === "string" && status.trim()) {
+        filter.status = { $regex: escapeRegex(status.trim().slice(0, 30)), $options: "i" };
+    }
+
+    if (typeof course === "string" && course.trim()) {
+        filter.course = { $regex: escapeRegex(course.trim().slice(0, 80)), $options: "i" };
+    }
+
+    applyDateRangeFilter(filter, startDate, endDate);
+
+    const contacts = await Contact.find(filter).sort({ createdAt: -1 });
+    return contacts;
+};
+
+module.exports = {
+    createContact,
+    getContact,
+    getContactById,
+    updateEnquiryStatus,
+    deleteEnquiry,
+    getAllContactsForExport,
+};

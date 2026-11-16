@@ -32,7 +32,7 @@ router.get(
 router.post(
     "/",
     authMiddleware,
-    authorize("superAdmin"),
+    authorize("superAdmin", "admin"),
     csrfMiddleware,
     validate(createCategorySchema),
     asyncHandler(createCategory)
@@ -42,7 +42,7 @@ router.post(
 router.put(
     "/reorder",
     authMiddleware,
-    authorize("superAdmin"),
+    authorize("superAdmin", "admin"),
     csrfMiddleware,
     validate(reorderCategoriesSchema),
     asyncHandler(reorderCategories)
@@ -51,7 +51,7 @@ router.put(
 router.patch(
     "/reorder",
     authMiddleware,
-    authorize("superAdmin"),
+    authorize("superAdmin", "admin"),
     csrfMiddleware,
     validate(reorderCategoriesSchema),
     asyncHandler(reorderCategories)
@@ -61,7 +61,7 @@ router.patch(
 router.patch(
     "/:id",
     authMiddleware,
-    authorize("superAdmin"),
+    authorize("superAdmin", "admin"),
     csrfMiddleware,
     validate(updateCategorySchema),
     asyncHandler(updateCategory)
@@ -71,7 +71,7 @@ router.patch(
 router.delete(
     "/:id",
     authMiddleware,
-    authorize("superAdmin"),
+    authorize("superAdmin", "admin"),
     csrfMiddleware,
     asyncHandler(deleteCategory)
 );
