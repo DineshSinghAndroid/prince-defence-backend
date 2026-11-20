@@ -22,3 +22,11 @@ yarn-error.log*
 # operating system files
 .DS_Store
 Thumbs.db
+
+# sqlite databases
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+/data/*.sqlite*
+!/data/.gitkeep

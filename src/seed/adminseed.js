@@ -1,3 +1,4 @@
+require("../config/sqliteHook");
 require("dotenv").config(); 
 const bcrypt = require("bcrypt"); 
 const Admin = require("../models/Admin"); 

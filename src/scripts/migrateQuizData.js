@@ -1,3 +1,4 @@
+require("../config/sqliteHook");
 require("dotenv").config();
 const mongoose = require("mongoose");
 const QuizAttempt = require("../models/QuizAttempt");

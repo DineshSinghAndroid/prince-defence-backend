@@ -1,4 +1,4 @@
-
+require("./config/sqliteHook");
 require("dotenv").config();
 
 const app = require("./app");
