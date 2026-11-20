@@ -19,7 +19,7 @@ const createSuperAdmin = async () => {
 
     const admin = await Admin.create({ 
       name: "Prince", 
-      email: "princewebdev63@gmail.com",
+      email: process.env.ADMIN_EMAIL || "admin@princedefence.com",
       role: "superAdmin", 
       password: hashedPassword 
     }); 
